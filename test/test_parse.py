@@ -16,6 +16,7 @@ class LogParserTestCase(unittest.TestCase):
                 self.assertEquals('x86', entry.arch)
                 self.assertEquals('win32', entry.ws)
                 self.assertEquals('en_US', entry.nl)
+		self.assertEquals('1302524564', entry.timestamp) # 2011-04-11 15:22:44 in Etc/GMT
 	
 if __name__ == "__main__":
     unittest.main()   
