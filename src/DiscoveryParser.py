@@ -52,6 +52,16 @@ class DBWriter:
 					  (entry.id, entry.discovery, entry.product, entry.buildId, entry.os, entry.arch, entry.ws, entry.nl, entry.timestamp))
 		cursor.close()
 		db.commit()
+
+	def get_most_recent_timestamp(self):
+		db = MySQLdb.connect(host=self.host, db = self.db, user = self.user, passwd = self.passwd, unix_socket = self.unix_socket )
+		cursor = db.cursor()
+		cursor.execute("""SELECT UNIX_TIMESTAMP(MAX(_timestamp)) FROM discovery_log_entry""")
+		most_recent = cursor.fetchone()[0]
+		cursor.close()
+		db.commit()
+
+		return most_recent
 					
 
 class LogEntry:
@@ -68,7 +78,8 @@ class LogEntry:
 
 if __name__ == "__main__":
 	l = LogReader()
-	l.readFile('test/data/log.txt')
 	d = DBWriter()
+	l.lastTimestamp = d.get_most_recent_timestamp()
+	l.readFile('test/data/log.txt')
 	d.entries = l.entries
 	d.write()
