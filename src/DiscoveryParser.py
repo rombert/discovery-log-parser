@@ -6,7 +6,9 @@ class LogReader:
 	prefix = '/stats/mylyn/discovery'
 	prefixLength = len(prefix)
 
-	entries = []
+	def __init__(self):
+		self.entries = []
+		self.lastTimestamp = 0
 
 	def readFile(self, logFile):
 		inp = open(logFile, "r")
@@ -29,7 +31,8 @@ class LogReader:
 		delta = timedelta(hours = offset / 100 )
 		request_datetime -= delta
 		entry.timestamp = str(int(request_datetime.strftime("%s")))
-		self.entries.append(entry)
+		if ( int(entry.timestamp) > self.lastTimestamp ):
+			self.entries.append(entry)
 
 class DBWriter:
 	
