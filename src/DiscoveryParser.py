@@ -1,4 +1,5 @@
 from datetime import datetime,timedelta,time
+import MySQLdb
 
 class LogReader:
 
@@ -30,6 +31,26 @@ class LogReader:
 		entry.timestamp = str(int(request_datetime.strftime("%s")))
 		self.entries.append(entry)
 
+class DBWriter:
+	
+	entries = []
+	host = "localhost"
+	user = "root"
+	passwd = ""
+	db = "test"
+	unix_socket = "/var/lib/mysql/mysql.sock"
+
+	def write(self):
+		db = MySQLdb.connect(host=self.host, db = self.db, user = self.user, passwd = self.passwd, unix_socket = self.unix_socket )
+		cursor = db.cursor()
+		for entry in self.entries:
+			cursor.execute("""INSERT INTO discovery_log_entry (id, discovery, product, buildId, os, arch, ws, nl, _timestamp) 
+					  VALUES (%s, %s, %s, %s, %s, %s, %s, %s, FROM_UNIXTIME(%s))""", 
+					  (entry.id, entry.discovery, entry.product, entry.buildId, entry.os, entry.arch, entry.ws, entry.nl, entry.timestamp))
+		cursor.close()
+		db.commit()
+					
+
 class LogEntry:
 
 	id = ''
@@ -41,3 +62,10 @@ class LogEntry:
 	ws = ''
 	nl = ''
 	timestamp = ''
+
+if __name__ == "__main__":
+	l = LogReader()
+	l.readFile('test/data/log.txt')
+	d = DBWriter()
+	d.entries = l.entries
+	d.write()
