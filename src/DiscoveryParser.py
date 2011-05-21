@@ -1,4 +1,5 @@
-from datetime import datetime,timedelta,time
+from datetime import datetime,timedelta
+import time
 import MySQLdb
 
 class LogReader:
@@ -26,7 +27,7 @@ class LogReader:
 
 		ts = line[line.find('[')+1:line.find(']')]
 		# %z seems not supported, see http://stackoverflow.com/questions/526406/python-time-to-age-part-2-timezones/526450#526450
-		request_datetime = datetime.strptime(ts[:-6], "%d/%b/%Y:%H:%M:%S") 
+		request_datetime = datetime(*time.strptime(ts[:-6], "%d/%b/%Y:%H:%M:%S")[0:6])
 		offset = int(ts[-5:])
 		delta = timedelta(hours = offset / 100 )
 		request_datetime -= delta
